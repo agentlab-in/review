@@ -49,7 +49,7 @@ There is no bin to link. Run the server in development with tsx, for example:
 The execution path is intentionally shallow:
 
 ```text
-src/program.ts (side-effect free: createProgram + runReviewCli for alab-cli)
+src/program.ts (side-effect free: createReviewCommand mount for alab-cli)
   -> src/commands/{start,list,remove,cleanup}.ts
   -> src/lib/{project,index-store,comments,rematch,overlay,server,target}.ts
   -> <reviewed-dir>/.alab/ (id file + review.json) and ~/.alab/review-index.json
@@ -57,12 +57,12 @@ src/program.ts (side-effect free: createProgram + runReviewCli for alab-cli)
 
 Key responsibilities:
 
-- `src/program.ts` exports `createProgram` and `runReviewCli` and runs
-  nothing on import. With `argv[2] === "review"` it builds an `alab` root
-  with a mounted `review` subcommand, matching the alab-cli router contract
-  (it calls tool `runCli(argv)` in process with the original argv).
-  Otherwise it builds a standalone `review` program for development and
-  tests.
+- `src/program.ts` exports `createReviewCommand`, the mountable `review`
+  command the `alab` binary attaches with `addCommand`, plus `createProgram`
+  (the dev root named `alab` with `review` mounted) and `runReviewCli` for
+  development and tests. It runs nothing on import. Both the mountable
+  command and the dev root use `exitOverride`, so errors throw instead of
+  exiting and the hosting binary owns exit codes.
 - `src/index.ts` is the public library entry. It re-exports the program
   factory, the commands, and the store, server, and rematch functions.
 - `src/commands/start.ts` starts the foreground server, prints the project

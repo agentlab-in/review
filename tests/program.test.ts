@@ -1,7 +1,7 @@
 import { spawnSync } from "node:child_process";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
-import { createProgram } from "../src/program.js";
+import { createProgram, createReviewCommand } from "../src/program.js";
 
 const expectedCommands = ["start", "list", "remove", "cleanup"];
 const root = resolve(import.meta.dirname, "..");
@@ -14,13 +14,15 @@ function runNode(args: string[]) {
 }
 
 describe("review program surface", () => {
-  it("exposes the v0 commands without a public bin", () => {
-    const program = createProgram();
-    expect(program.commands.map((command) => command.name())).toEqual(expectedCommands);
+  it("exposes the v0 commands on the mountable review command", () => {
+    const review = createReviewCommand();
+    expect(review.name()).toBe("review");
+    expect(review.commands.map((command) => command.name())).toEqual(expectedCommands);
   });
 
-  it("mounts under alab review for the umbrella CLI", () => {
-    const program = createProgram({ legacyAlab: true });
+  it("mounts review under the alab dev root for the umbrella CLI", () => {
+    const program = createProgram();
+    expect(program.name()).toBe("alab");
     const review = program.commands.find((command) => command.name() === "review");
     expect(review?.commands.map((command) => command.name())).toEqual(expectedCommands);
   });

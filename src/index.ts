@@ -7,7 +7,7 @@
  * server, or prints anything.
  */
 
-export { createProgram, runReviewCli, REVIEW_VERSION } from "./program.js";
+export { createProgram, createReviewCommand, runReviewCli, REVIEW_VERSION } from "./program.js";
 export { startCommand } from "./commands/start.js";
 export { listCommand } from "./commands/list.js";
 export { removeCommand } from "./commands/remove.js";

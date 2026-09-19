@@ -79,34 +79,36 @@ function addReviewCommands(cmd: Command): void {
 }
 
 /**
- * Side-effect free program factory for the future `alab review` wiring.
- * Importing this module parses nothing and prints nothing. The umbrella CLI
- * should call `runReviewCli(argv)` with the original process.argv, the same
- * way it calls the Pages `runCli`.
+ * Mountable `review` command for the `alab` binary. The umbrella CLI
+ * attaches it with `addCommand(createReviewCommand())`, the same way it
+ * mounts the Pages command. Importing this module parses nothing and
+ * prints nothing. Both the mountable command and the dev root below use
+ * `exitOverride`, so errors throw instead of exiting and the hosting
+ * binary owns exit codes.
  */
-export function createProgram(options?: { legacyAlab?: boolean }): Command {
-  if (options?.legacyAlab) {
-    const program = new Command();
-    program.exitOverride();
-    program.name("alab").description("agentlab CLI");
-    const review = program.command("review").description("Local click-to-comment review server");
-    addReviewCommands(review);
-    return program;
-  }
-  const program = new Command();
-  program.exitOverride();
-  program
-    .name("review")
+export function createReviewCommand(): Command {
+  const review = new Command("review");
+  review.exitOverride();
+  review
     .description("Local click-to-comment review server for static HTML folders")
     .version(REVIEW_VERSION)
     .addHelpText("after", HELP_TEXT);
-  addReviewCommands(program);
+  addReviewCommands(review);
+  return review;
+}
+
+/** Development root named `alab` with `review` mounted. Behaves like the binary. */
+export function createProgram(): Command {
+  const program = new Command();
+  program.exitOverride();
+  program.name("alab").description("agentlab CLI").version(REVIEW_VERSION);
+  program.addCommand(createReviewCommand());
   return program;
 }
 
-/** Run the review CLI with the given argv. Used by `alab review ...` later. */
+/** Run the review CLI with the given argv. Used in development and tests. */
 export async function runReviewCli(argv = process.argv): Promise<void> {
-  const program = createProgram({ legacyAlab: argv[2] === "review" });
+  const program = createProgram();
   try {
     await program.parseAsync(argv);
   } catch (err) {

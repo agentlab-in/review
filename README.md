@@ -68,9 +68,8 @@ console.log(server.url);
 ```
 
 Umbrella wiring (same contract as Pages): the router imports
-`runReviewCli(argv)` from `@agentlab/review/program` and calls it in process
-with the original `process.argv` when the first tool argument is `review`.
-Importing `src/program.ts` parses nothing and prints nothing.
+`createReviewCommand` from `@agentlab/review/program` and mounts it with
+`addCommand`. Importing `src/program.ts` parses nothing and prints nothing.
 
 ## Development
 
