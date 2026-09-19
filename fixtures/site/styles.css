@@ -1,0 +1,9 @@
+main {
+  max-width: 40rem;
+  margin: 3rem auto;
+  font-family: system-ui, sans-serif;
+}
+
+.lede {
+  color: #333;
+}
